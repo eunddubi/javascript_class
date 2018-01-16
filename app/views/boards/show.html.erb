@@ -1,0 +1,94 @@
+<h1><%= @board.title %></h1>
+<p><%= @board.contents %></p>
+
+
+<% if @like.count > 0%>
+<button type="button" class="btn btn-warning" id="like-button"><i style="font-size:1em;" class="fas fa-moon"></i> (<span id="like-count"><%= @board.likes.count%></span>)</button>
+
+<% else %>
+<button type="button" class="btn btn-light" id="like-button"><i style="font-size:1em;" class="fas fa-moon"></i> (<span id="like-count"><%= @board.likes.count%></span>)</button>
+<% end %>
+
+<!-- 수정 -->
+<a ><button type="button" class="btn btn-secondary"><i class="fas fa-keyboard"></i></button></a>
+<!-- 삭제 -->
+<a ><button type="button" class="btn btn-secondary"><i class="fas fa-trash-alt"></i></button></a>
+<!-- 홈 -->
+<a href="/"><button type="button" class="btn btn-dark"><i class="fas fa-home"></i></button></a>
+
+<br/><br/><br/>
+
+<!-- 코멘트 -->
+<div class="container">
+  <form class="form-inline" id="comment-form">
+    <input type="text" class="form-control  col-11" id="comment" />&nbsp;&nbsp;&nbsp;
+    <button type="submit" class="btn btn-dark create-comment"><i class="fas fa-edit"></i></button>
+  </form>
+</div>
+
+<br/><br/><br/>
+
+<!-- 코멘트 테이블 -->
+<p><i class="fas fa-bullhorn"></i> <b>   comments</b></p>
+<hr />
+<table class="table">
+  <thead>
+  <tr align="center">
+    <th align="left" scope="col">Contents</th>
+    <th scope="col">Edit</th>
+    <th scope="col">Delete</th>
+  </tr>
+</thead>
+  <tbody class="comment-list">
+    <% @board.comments.reverse.each do |comment| %>
+    <tr>
+      <td width="90%"><%= comment.contents %></td>
+      <!-- 수정 -->
+      <td align="center"><a><i class="fas fa-pencil-alt"></i></a></td>
+      <!-- 삭제 -->
+      <td align="center"><a data-method="DELETE" href="/boards/delete_comment/<%= comment.id %>"><i class="fas fa-times"></i></a></td>
+    </tr>
+    <%end%>
+  </tbody>
+</table>
+
+
+<script>
+  $(function(){
+    // 1.좋아요 버튼을 클릭하면
+      $('#like-button').on('click', function(){
+        $.ajax({
+          url: '/boards/<%= @board.id %>/like',
+          method: 'POST'
+        });
+    // 2.버튼의 색을 빨강으로 바꾸고
+        // if(this.classList.contains('btn-light')){
+        //    $('#like-count').html(parseInt($('#like-count').html())+1);
+        //    $(this).addClass('btn-warning').removeClass('btn-light');
+        // }else{
+        //   $('#like-count').html(parseInt($('#like-count').html())-1);
+        //   $(this).addClass('btn-light').removeClass('btn-warning');
+        // }
+        //
+        // console.log("버튼 색 바뀌었나?");
+    // 3.좋아요 카운트를 1 증가시킨다.
+
+      });
+  });
+
+  $('#comment-form').on('submit', function(event){
+    event.preventDefault();
+    console.log("댓글 달기 버튼 눌림");
+    var c  = $('#comment').val();
+    console.log(c);
+    $.ajax({
+      url: "/boards/<%=@board.id%>/create_comment",
+      method: "POST",
+      data: { contents: c}//inputname: value
+    });
+  });
+  // 4.빨간 버튼을 누르면
+  // 5.다시 원래 버튼으로 바뀌며
+  // 6.좋아요가 취소된다.
+
+</script>
